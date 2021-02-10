@@ -49,6 +49,7 @@ class KeyType(enum.Enum):
 
     # Keys used in the keyboard
     BASIC_KEY = (BasicFunction(), False)
+    EMOJI_KEY = (BasicFunction(), True)
     ENTER_KEY = (EnterFunction(), True)
     SPACE_BAR_KEY = (SpaceBarFunction(), False)
     BACKSPACE_KEY = (BackspaceFunction(), True)
@@ -60,6 +61,7 @@ class KeyType(enum.Enum):
     SWITCH_TO_UPPER_KEY = (SwitchWindowFunction(link="Upper"), False)
     SWITCH_TO_LOWER_KEY = (SwitchWindowFunction(link="Lower"), False)
     SWITCH_TO_SYMBOLS_KEY = (SwitchWindowFunction(link="Symbols"), False)
+    SMILEY_KEY = (SwitchWindowFunction(link="Symbols"), True)
     SWITCH_TO_ADDITIONAL_SYMBOLS_KEY = (SwitchWindowFunction(link="AdditionalSymbols"), False)
 
     # Keys used to link keyboard and menu
