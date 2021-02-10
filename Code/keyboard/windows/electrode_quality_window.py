@@ -96,6 +96,13 @@ class ElectrodeQualityWindow(Window):
                                             col=self.style['text_color'],
                                             align_hor='center',
                                             align_vert='top')
+                                            
+        self.logo = self.facade.create_icon(
+                    "key_icons\MindAffect_Logo.png",
+                    label_col=self.style["MA_orange"],
+                    size=(.3,.3),
+                    pos=(.95,.9),
+                )                                            
 
         # Starts building the screen upon initialisation:
         self.dataringbuffer = deque()  # deque so efficient sliding data window
@@ -120,12 +127,14 @@ class ElectrodeQualityWindow(Window):
         self.phase = 0
         self.facade.set_text(self.text, self.texts[self.phases[self.phase]])
         self.facade.toggle_text_render(self.text, True)
+        self.facade.toggle_image_render(self.logo, True)
         for key in self.keys:
             key.toggle_render(True)
 
     def deactivate(self):
         """Deactivates all visual and functional elements of the Window."""
         self.facade.toggle_text_render(self.text, False)
+        self.facade.toggle_image_render(self.logo, False)
         for key in self.keys:
             key.toggle_render(False)
 

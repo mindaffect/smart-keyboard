@@ -96,6 +96,13 @@ class MenuWindow(Window):
                 noisetag=noisetag
             )
         }
+        
+        self.logo = self.facade.create_icon(
+            "key_icons\MindAffect_Logo.png",
+            label_col=self.style["MA_orange"],
+            size=(.3,.3),
+            pos=(.95,.1),
+        )
 
         self.active_window = "GeneralMenu"
         self.switched_windows = False
@@ -111,12 +118,14 @@ class MenuWindow(Window):
         for key in self.keys:
             key.toggle_render(True)
         self.windows[self.active_window].activate()
+        self.facade.toggle_image_render(self.logo, True)
 
     def deactivate(self):
         """Deactivates all visual and functional elements of this Window."""
         for key in self.keys:
             key.toggle_render(False)
         self.windows[self.active_window].deactivate()
+        self.facade.toggle_image_render(self.logo, False)
 
     def switch_window(self, window_name):
         """

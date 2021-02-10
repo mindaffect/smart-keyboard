@@ -152,6 +152,13 @@ class CalibrationWindow(Window):
             align_hor='center',
             align_vert='top'
         )
+        
+        self.logo = self.facade.create_icon(
+            "key_icons\MindAffect_Logo.png",
+            label_col=self.style["MA_orange"],
+            size=(.3,.3),
+            pos=(.95,.9),
+        )
 
         # Last calibration results:
         self.pred = None
@@ -160,7 +167,8 @@ class CalibrationWindow(Window):
     def activate(self):
         """Activates all visual and functional elements of this Window."""
         self.facade.toggle_text_render(self.instruction, True)
-
+        self.facade.toggle_image_render(self.logo, True)
+        
         if self.use_optometer:
             self.facade.toggle_shape_render(self.opto, True)
 
@@ -172,6 +180,7 @@ class CalibrationWindow(Window):
     def deactivate(self):
         """Deactivates all visual and functional elements of this Window."""
         self.facade.toggle_text_render(self.instruction, False)
+        self.facade.toggle_image_render(self.logo, False)
         self.facade.toggle_shape_render(self.opto, False)
         self.windows[self.active_window].deactivate()
 

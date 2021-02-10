@@ -162,6 +162,13 @@ class KeyboardWindow(Window):
             color=self.style["button_color"],
             line_color=self.style["line_color"]
         )
+        
+        self.logo = self.facade.create_icon(
+            "key_icons\MindAffect_Logo.png",
+            label_col=self.style["MA_orange"], 
+            size=(.3,.3),
+            pos=(.95,.1),
+        )
 
         self.active_window = "Lower"
         self.switched_windows = False
@@ -175,6 +182,8 @@ class KeyboardWindow(Window):
     def activate(self):
         """Activates all visual and functional elements of this Window."""
         self.text_field.activate()
+        self.facade.toggle_image_render(self.logo, True)
+
         if self.keys:
             for key in self.keys:
                 key.toggle_render(True)
@@ -193,6 +202,8 @@ class KeyboardWindow(Window):
         """Deactivates all visual and functional elements of this Window."""
         self.is_active = False
         self.text_field.deactivate()
+        self.facade.toggle_image_render(self.logo, False)
+
         self.facade.toggle_shape_render(self.opto, False)
         for key in self.keys:
             key.toggle_render(False)
