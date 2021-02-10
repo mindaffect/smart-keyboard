@@ -167,7 +167,7 @@ class KeyboardWindow(Window):
             "key_icons\MindAffect_Logo.png",
             label_col=self.style["MA_orange"], 
             size=(.3,.3),
-            pos=(.95,.1),
+            pos=(.95,.9),
         )
 
         self.active_window = "Lower"
