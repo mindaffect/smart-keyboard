@@ -119,7 +119,7 @@ Show basic usage of our module.
 
 Authors and acknowledgment
 --------------------------
-The base keyboard module plus word completion was developed by the following group of students:
+*The base keyboard module plus word completion was developed by the following group of students:*
 
 Thomas de Lange,
 Thomas Jurriaans,
@@ -129,9 +129,7 @@ Jort Gutter,
 Florian Handke,
 Stijn Boosman
 
-in close collaboration with:
-
-`MindAffect <https://www.mindaffect.nl/>`_
+*Developed in close collaboration with `MindAffect <https://www.mindaffect.nl/>`_*
 
 License
 -------
