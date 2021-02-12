@@ -63,8 +63,6 @@ Our module can be installed as follows.
    import everything
    install(everything)
 
-But it will probably be part of the pymindaffectbci module.
-
 Requirements
 ~~~~~~~~~~~~
 Our keyboard implementation is based on the `mindaffectbci module
@@ -101,14 +99,6 @@ Show basic usage of our module.
    print('wow look at how this works!')
 
 
-Support
--------
-This is where we put links for users in case they encounter problems.
-
-We could add a mailing adress but since we are probably not going to keep updating
-our code it might be best to just point to help or faq page (if we make one).
-
-
 Authors and acknowledgment
 --------------------------
 Thomas de Lange,
@@ -124,7 +114,7 @@ Stijn Boosman
 
 License
 -------
-MIT License (MIT) 
+MIT License (MIT)
 
 
 Project status
