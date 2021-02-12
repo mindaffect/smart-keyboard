@@ -34,7 +34,7 @@ We recommend using Python version at least 3.8
 How to use in combination with MindAffectBCI software
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 open a command prompt and go through the following steps:
-    * navigate to the smart-kyboard directory
+    * navigate to the smart-keyboard directory
     * If you have not already completed the steps from the Requirements section, please do so.
     * you can finish up the installation process by executing the following command:
     
