@@ -20,11 +20,14 @@ Our keyboard implementation is based on the `mindaffectbci module
 <https://www.mindaffect.nl/>`_ so this should be installed.
 
 ```
-  pip install mindaffectBCI
+pip install mindaffectBCI
 ```
 
-The required packages can be found in requirements.txt and installed as follows    
-  pip install -r requirements.txt
+The required packages can be found in requirements.txt and installed as follows
+
+```
+pip install -r requirements.txt
+```
 
 We recommend using Python version at least 3.8
 
@@ -34,12 +37,18 @@ open a command prompt and go through the following steps:
     * navigate to the smart-kyboard directory
     * If you have not already completed the steps from the Requirements section, please do so.
     * you can finish up the installation process by executing the following command:
-        python setup.py develop
+    
+```
+python setup.py develop
+```
 
 Before starting the keyboard app, the MindaffectBCI module needs to be running in the background. If you don't know how to do this, you can find a guide on the `PymindaffectBCI repository <https://github.com/mindaffect/pymindaffectBCI/tree/open_source>`_ . 
     * Now, go back to the command prompt you've opened earlier and navigate to the *keyboard* directoy. 
     * As the final step, run the following command:
-        python bci-keyboard.py
+    
+```    
+python bci-keyboard.py
+```
 
 Adding a configurable JSON keyboard
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
