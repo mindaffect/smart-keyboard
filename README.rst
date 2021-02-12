@@ -39,15 +39,12 @@ open a command prompt and go through the following steps:
     * you can finish up the installation process by executing the following command 
       ```
          python setup.py develop
-      ```
 
-Before starting the keyboard app, the MindaffectBCI module needs to be running in the background. If you don't know how to do this, you can find a guide on the `PymindaffectBCI repository <https://github.com/mindaffect/pymindaffectBCI/tree/open_source/mindaffectBCI>`_ . 
-
+Before starting the keyboard app, the MindaffectBCI module needs to be running in the background. If you don't know how to do this, you can find a guide on the `PymindaffectBCI repository <https://github.com/mindaffect/pymindaffectBCI/tree/open_source>`_ . 
     * Now, go back to the command prompt you've opened earlier and navigate to the *keyboard* directoy. 
     * As the final step, run the following command:
       ```
          python bci-keyboard.py
-      ```
 
 Adding a configurable JSON keyboard
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
