@@ -13,6 +13,41 @@ This module implements a keyboard for the BCI system developed by MindAffect.
    * Text to speech: allows the user to say text out loud (with a 'say-out-loud' key).
    * Word correction: adds automatic correction of misspelled words with easy ability to
      undo.
+Requirements
+~~~~~~~~~~~~
+Our keyboard implementation is based on the `mindaffectbci module
+<https://pypi.org/project/mindaffectBCI/>`_ developed by `MindAffect
+<https://www.mindaffect.nl/>`_ so this should be installed.
+
+.. code-block:: python
+
+   pip install mindaffectBCI
+
+The required packages can be found in requirements.txt and installed as follows::
+
+.. code-block:: python
+
+   pip install -r requirements.txt
+
+We recommend using Python version at least 3.8
+
+How to use in combination with MindAffectBCI software
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+open a command prompt and go through the following steps:
+    * navigate to the smart-kyboard directory
+    * If you have not already completed the steps from the Requirements section, please do so.
+    * you can finish up the installation process by executing the following command 
+  
+.. code-block:: python
+   python setup.py develop
+
+Before starting the keyboard app, the MindaffectBCI module needs to be running in the background. If you don't know how to do this, you can find a guide on the `PymindaffectBCI repository <https://github.com/mindaffect/pymindaffectBCI/tree/open_source/mindaffectBCI>`_ . 
+
+    * Now, go back to the command prompt you've opened earlier and navigate to the *keyboard* directoy. 
+    * As the final step, run the following command:
+.. code-block:: python
+   python bci-keyboard.py
+
 
 Adding a configurable JSON keyboard
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,24 +97,6 @@ Our module can be installed as follows.
    
    import everything
    install(everything)
-
-Requirements
-~~~~~~~~~~~~
-Our keyboard implementation is based on the `mindaffectbci module
-<https://pypi.org/project/mindaffectBCI/>`_ developed by `MindAffect
-<https://www.mindaffect.nl/>`_ so this should be installed.
-
-.. code-block:: python
-
-   pip install mindaffectBCI
-
-The required packages can be found in requirements.txt and installed as follows::
-
-.. code-block:: python
-
-   pip install -r requirements.txt
-
-We recommend using Python version at least 3.5
 
 Problems
 ~~~~~~~~
