@@ -37,17 +37,17 @@ open a command prompt and go through the following steps:
     * navigate to the smart-kyboard directory
     * If you have not already completed the steps from the Requirements section, please do so.
     * you can finish up the installation process by executing the following command 
-  
-.. code-block:: python
-   python setup.py develop
+      ```
+         python setup.py develop
+      ```
 
 Before starting the keyboard app, the MindaffectBCI module needs to be running in the background. If you don't know how to do this, you can find a guide on the `PymindaffectBCI repository <https://github.com/mindaffect/pymindaffectBCI/tree/open_source/mindaffectBCI>`_ . 
 
     * Now, go back to the command prompt you've opened earlier and navigate to the *keyboard* directoy. 
     * As the final step, run the following command:
-.. code-block:: python
-   python bci-keyboard.py
-
+      ```
+         python bci-keyboard.py
+      ```
 
 Adding a configurable JSON keyboard
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
