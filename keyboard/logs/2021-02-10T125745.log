@@ -1,0 +1,49 @@
+2021-02-10 12:57:55,693 STREAM b'IHDR' 16 13
+2021-02-10 12:57:55,693 STREAM b'IDAT' 41 8192
+2021-02-10 12:57:55,718 langs: {'af': 'Afrikaans', 'ar': 'Arabic', 'bn': 'Bengali', 'bs': 'Bosnian', 'ca': 'Catalan', 'cs': 'Czech', 'cy': 'Welsh', 'da': 'Danish', 'de': 'German', 'el': 'Greek', 'en': 'English', 'eo': 'Esperanto', 'es': 'Spanish', 'et': 'Estonian', 'fi': 'Finnish', 'fr': 'French', 'gu': 'Gujarati', 'hi': 'Hindi', 'hr': 'Croatian', 'hu': 'Hungarian', 'hy': 'Armenian', 'id': 'Indonesian', 'is': 'Icelandic', 'it': 'Italian', 'ja': 'Japanese', 'jw': 'Javanese', 'km': 'Khmer', 'kn': 'Kannada', 'ko': 'Korean', 'la': 'Latin', 'lv': 'Latvian', 'mk': 'Macedonian', 'ml': 'Malayalam', 'mr': 'Marathi', 'my': 'Myanmar (Burmese)', 'ne': 'Nepali', 'nl': 'Dutch', 'no': 'Norwegian', 'pl': 'Polish', 'pt': 'Portuguese', 'ro': 'Romanian', 'ru': 'Russian', 'si': 'Sinhala', 'sk': 'Slovak', 'sq': 'Albanian', 'sr': 'Serbian', 'su': 'Sundanese', 'sv': 'Swedish', 'sw': 'Swahili', 'ta': 'Tamil', 'te': 'Telugu', 'th': 'Thai', 'tl': 'Filipino', 'tr': 'Turkish', 'uk': 'Ukrainian', 'ur': 'Urdu', 'vi': 'Vietnamese', 'zh-CN': 'Chinese', 'zh-TW': 'Chinese (Mandarin/Taiwan)', 'zh': 'Chinese (Mandarin)'}
+2021-02-10 12:58:04,787 STREAM b'IHDR' 16 13
+2021-02-10 12:58:04,788 STREAM b'IDAT' 41 8192
+2021-02-10 12:58:04,827 STREAM b'IHDR' 16 13
+2021-02-10 12:58:04,828 STREAM b'IDAT' 41 8192
+2021-02-10 12:58:04,873 STREAM b'IHDR' 16 13
+2021-02-10 12:58:04,873 STREAM b'IDAT' 41 8192
+2021-02-10 12:58:04,933 STREAM b'IHDR' 16 13
+2021-02-10 12:58:04,934 STREAM b'IDAT' 41 8192
+2021-02-10 12:58:05,002 STREAM b'IHDR' 16 13
+2021-02-10 12:58:05,002 STREAM b'IDAT' 41 7649
+2021-02-10 12:58:05,215 STREAM b'IHDR' 16 13
+2021-02-10 12:58:05,215 STREAM b'IDAT' 41 8192
+2021-02-10 12:58:05,249 STREAM b'IHDR' 16 13
+2021-02-10 12:58:05,249 STREAM b'IDAT' 41 8192
+2021-02-10 12:58:05,295 STREAM b'IHDR' 16 13
+2021-02-10 12:58:05,295 STREAM b'IDAT' 41 8192
+2021-02-10 12:58:05,337 STREAM b'IHDR' 16 13
+2021-02-10 12:58:05,337 STREAM b'IDAT' 41 8192
+2021-02-10 12:58:05,426 STREAM b'IHDR' 16 13
+2021-02-10 12:58:05,426 STREAM b'IDAT' 41 7649
+2021-02-10 12:58:05,448 Something went wrong loading the keyboard configuration.
+Please make sure there are no typos in the file.
+See the Traceback for details.
+Traceback (most recent call last):
+  File "d:\users\shari\documents\github\smart-keyboard\code\keyboard\keyboard_loader.py", line 60, in load_json
+    return json.load(open(file, "r", encoding="utf-16"))
+  File "C:\Python38\lib\json\__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "C:\Python38\lib\json\__init__.py", line 357, in loads
+    return _default_decoder.decode(s)
+  File "C:\Python38\lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "C:\Python38\lib\json\decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+json.decoder.JSONDecodeError: Expecting ',' delimiter: line 13 column 2 (char 636)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "bci_keyboard.py", line 146, in build_windows
+    "Keyboard": KeyboardWindow(
+  File "d:\users\shari\documents\github\smart-keyboard\code\keyboard\windows\keyboard_window.py", line 141, in __init__
+    keypad_layout=KeyboardLoader.load_json(keypad_layouts["Symbols"]),
+  File "d:\users\shari\documents\github\smart-keyboard\code\keyboard\keyboard_loader.py", line 71, in load_json
+    Logger.handle_generic()
+AttributeError: type object 'Logger' has no attribute 'handle_generic'

@@ -1,0 +1,6 @@
+README.rst
+setup.py
+MindAffect_keyboard.egg-info/PKG-INFO
+MindAffect_keyboard.egg-info/SOURCES.txt
+MindAffect_keyboard.egg-info/dependency_links.txt
+MindAffect_keyboard.egg-info/top_level.txt
