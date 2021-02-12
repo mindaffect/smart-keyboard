@@ -129,6 +129,8 @@ Jort Gutter,
 Florian Handke,
 Stijn Boosman
 
+in close collaboration with:
+
 `MindAffect <https://www.mindaffect.nl/>`_
 
 License
