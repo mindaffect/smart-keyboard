@@ -19,14 +19,12 @@ Our keyboard implementation is based on the `mindaffectbci module
 <https://pypi.org/project/mindaffectBCI/>`_ developed by `MindAffect
 <https://www.mindaffect.nl/>`_ so this should be installed.
 
-.. code-block:: python
-
+```
    pip install mindaffectBCI
 
 The required packages can be found in requirements.txt and installed as follows::
 
-.. code-block:: python
-
+```
    pip install -r requirements.txt
 
 We recommend using Python version at least 3.8
