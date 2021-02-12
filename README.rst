@@ -1,4 +1,4 @@
-Complete BCI spelling system
+Smart BCI keyboard
 ============================
 
 
