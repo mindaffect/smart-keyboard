@@ -124,7 +124,7 @@ Stijn Boosman
 
 License
 -------
-MIT License (MIT) (?)
+MIT License (MIT) 
 
 
 Project status
