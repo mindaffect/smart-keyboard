@@ -139,7 +139,7 @@ class PsychopyFacade(FrameworkFacade):
     def add_click_feedback(self, key):
         self.click_feedback_buttons.append(key)
 
-    def create_text_field(self, size, pos, text_size, text_col, align_hor='left', align_vert='top', text=''):
+    def create_text_field(self, size, pos, text_size, text_col, align_hor='left', align_vert='top', text='',languageStyle='LTR'):
         """Creates and returns a psychopy Text object, the upper left corner aligned to the given position
         
         Args:
@@ -161,7 +161,8 @@ class PsychopyFacade(FrameworkFacade):
             pos=self.convert_pos(pos),
             color=self.convert_color(text_col), depth=-1, height=text_size/100,
             alignText=align_hor, anchorVert=align_vert,
-            wrapWidth=self.convert_size((size[0], 0))[0]
+            wrapWidth=self.convert_size((size[0], 0))[0],
+            languageStyle=languageStyle
         )
         textfield.autoDraw = False
         return textfield

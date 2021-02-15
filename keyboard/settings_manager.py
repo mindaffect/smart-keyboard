@@ -77,6 +77,7 @@ class SettingsManager:
             self.file = file
 
             self.language = self.file['settings']['language']
+            self.language_style = self.file['settings']['language_style']
             self.text_size = self.file["settings"]["text_size"]
             self.word_prediction_correction = self.file["settings"]["word_prediction_correction"]
 
@@ -88,11 +89,13 @@ class SettingsManager:
 
             self.setting_to_function = {
                 "language": self.set_language,
+                "language_style": self.set_language_style,
                 "text_size": self.set_text_size,
                 "word_prediction_correction": self.set_word_prediction_correction,
             }
             self.setting_from_function = {
                 "language": self.get_language,
+                "language_style": self.get_language_style,
                 "text_size": self.get_text_size,
                 "word_prediction_correction": self.get_word_prediction_correction,
             }
@@ -130,6 +133,17 @@ class SettingsManager:
         dictionary_retrieval.check_dictionary(self.language)
 
         self.write()
+        
+    def set_language_style(self, language_style):
+        """
+        Sets language style, writes to file and notifies observers.
+
+        Args:
+            language_style (str): The language style LTR or RTL
+        """
+        self.language_style = language_style
+        self.file["settings"]["language_style"] = self.language_style
+        self.write()    
 
     def set_word_prediction_correction(self, mode):
         """
@@ -152,6 +166,15 @@ class SettingsManager:
         if lang_tag:
             return self.language.lower()
         return self.language
+    
+    def get_language_style(self):
+        """
+        Returns the language style being used.
+
+        Return:
+            (str): Language style being used.
+        """    
+        return self.language_style    
 
     def get_text_size(self):
         """
