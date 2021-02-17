@@ -47,7 +47,7 @@ Before starting the keyboard app, the MindaffectBCI module needs to be running i
     * As the final step, run the following command:
     
 
-        python bci-keyboard.py
+        python bci_keyboard.py
 
 
 Adding a configurable JSON keyboard

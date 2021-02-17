@@ -1,12 +1,11 @@
-Metadata-Version: 1.0
+Metadata-Version: 1.2
 Name: MindAffect-keyboard
 Version: 0.0.0
 Summary: UNKNOWN
 Home-page: UNKNOWN
 Author: Thomas de Lange, Thomas Jurriaans, Damy Hillen, Joost Vossers, Jort Gutter, Florian Handke, Stijn Boosman
-Author-email: UNKNOWN
 License: BSD-3
-Description: Complete BCI spelling system
+Description: Smart BCI keyboard
         ============================
         
         
@@ -21,6 +20,42 @@ Description: Complete BCI spelling system
            * Text to speech: allows the user to say text out loud (with a 'say-out-loud' key).
            * Word correction: adds automatic correction of misspelled words with easy ability to
              undo.
+        Requirements
+        ~~~~~~~~~~~~
+        Our keyboard implementation is based on the `mindaffectbci module
+        <https://pypi.org/project/mindaffectBCI/>`_ developed by `MindAffect
+        <https://www.mindaffect.nl/>`_ so this should be installed.
+        
+        
+          pip install mindaffectBCI
+        
+        
+        The required packages can be found in requirements.txt and installed as follows
+        
+        
+          pip install -r requirements.txt
+        
+        
+        We recommend using Python version at least 3.8
+        
+        How to use in combination with MindAffectBCI software
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        open a command prompt and go through the following steps:
+            * navigate to the smart-keyboard directory
+            * If you have not already completed the steps from the Requirements section, please do so.
+            * you can finish up the installation process by executing the following command:
+            
+        
+                python setup.py develop
+        
+        
+        Before starting the keyboard app, the MindaffectBCI module needs to be running in the background. If you don't know how to do this, you can find a guide on the `PymindaffectBCI repository <https://github.com/mindaffect/pymindaffectBCI/tree/open_source>`_ . 
+            * Now, go back to the command prompt you've opened earlier and navigate to the *keyboard* directoy. 
+            * As the final step, run the following command:
+            
+        
+                python bci_keyboard.py
+        
         
         Adding a configurable JSON keyboard
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,26 +106,6 @@ Description: Complete BCI spelling system
            import everything
            install(everything)
         
-        But it will probably be part of the pymindaffectbci module.
-        
-        Requirements
-        ~~~~~~~~~~~~
-        Our keyboard implementation is based on the `mindaffectbci module
-        <https://pypi.org/project/mindaffectBCI/>`_ developed by `MindAffect
-        <https://www.mindaffect.nl/>`_ so this should be installed.
-        
-        .. code-block:: python
-        
-           pip install mindaffectBCI
-        
-        The required packages can be found in requirements.txt and installed as follows::
-        
-        .. code-block:: python
-        
-           pip install -r requirements.txt
-        
-        We recommend using Python version at least 3.5
-        
         Problems
         ~~~~~~~~
         First check if your Python version is not outdated and if all the required packages have
@@ -109,16 +124,10 @@ Description: Complete BCI spelling system
            print('wow look at how this works!')
         
         
-        Support
-        -------
-        This is where we put links for users in case they encounter problems.
-        
-        We could add a mailing adress but since we are probably not going to keep updating
-        our code it might be best to just point to help or faq page (if we make one).
-        
-        
         Authors and acknowledgment
         --------------------------
+        *The base keyboard module plus word completion was developed by the following group of students:*
+        
         Thomas de Lange,
         Thomas Jurriaans,
         Damy Hillen,
@@ -127,15 +136,16 @@ Description: Complete BCI spelling system
         Florian Handke,
         Stijn Boosman
         
-        `MindAffect <https://www.mindaffect.nl/>`_
-        
+        *Developed in close collaboration with* `MindAffect <https://www.mindaffect.nl/>`_
         
         License
         -------
-        MIT License (MIT) (?)
+        MIT License (MIT)
         
         
         Project status
         --------------
         Project is in development
+        
 Platform: UNKNOWN
+Requires-Python: >=3.8
