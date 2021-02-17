@@ -43,7 +43,7 @@ You will then be prompted to select a configuration file.  Navigate to the direc
 
 If all is installed correctly, the BCI should start and you should see the `smart_keyboard` configuration screen, which looks like this.
 
-.. image:: docs/images/configure_screen.png
+.. image:: docs/images/configuration_screen.png
    :width: 795
    :height: 630
    :scale: 50
