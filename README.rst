@@ -81,9 +81,9 @@ More information on this can be found in guide_to_creating_custom_json_keyboards
 
 Word prediction and autocompletion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Our word prediction and autocompletion module implements OpenAI's
-`Generative Pretrained Transformer 2 (GPT-2) <https://openai.com/blog/better-language-models/>`_
-This model was trained to predict the next word in 40GB of internet text.
+Our word prediction and autocompletion module ues a n-gram prediction engine, which has been trained on free to use e-books.  Standard (pretrained) languages that are provided in this module are English, Dutch and German.  It is posible to add custom languages via creating new N-gram files by training them on texts in the desired language.
+
+While typing the n-gram files are updated based on what the user types.  This means that frequently used words, names, or sentences will appear more often in the word prediction keys, with better predictions the more the keyboard is used.
 
 Word correction
 ~~~~~~~~~~~~~~~
