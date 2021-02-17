@@ -13,41 +13,55 @@ This module implements a keyboard for the BCI system developed by MindAffect.
    * Text to speech: allows the user to say text out loud (with a 'say-out-loud' key).
    * Word correction: adds automatic correction of misspelled words with easy ability to
      undo.
-Requirements
+
+Installation
 ~~~~~~~~~~~~
 Our keyboard implementation is based on the `mindaffectbci module
 <https://pypi.org/project/mindaffectBCI/>`_ developed by `MindAffect
-<https://www.mindaffect.nl/>`_ so this should be installed.
+<https://www.mindaffect.nl/>`_ so this should be installed.  (Or it will be automatically installed when installing this package.)
 
-
-  pip install mindaffectBCI
-
-
-The required packages can be found in requirements.txt and installed as follows
-
-
-  pip install -r requirements.txt
-
+The full list of required packages can be found in `requirements.txt`
 
 We recommend using Python version at least 3.8
 
-How to use in combination with MindAffectBCI software
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-open a command prompt and go through the following steps:
-    * navigate to the smart-keyboard directory
-    * If you have not already completed the steps from the Requirements section, please do so.
-    * you can finish up the installation process by executing the following command:
-    
+To install:
 
-        python setup.py develop
+ 1.  Download or checkout a copy of this repository, from `mindaffect/smart-keyboard <https://github.com/mindaffect/smart-keyboard>`_
+ 2.  Install this package and all it's dependencies into your python environment, by running the following command _in the director where this repository was downloaded_ ::
+
+     python3 -m pip install -e .
+
+If everything is correctly installed, then you can quickly test the system by running the mindaffectBCI with a 'fakedata' stream and the smart-keyboard configuration with ::
+
+    python3 -m mindaffectBCI.online_bci --config_file smart_keyboard.json --acquisition fakedata
+
+Note: If this does not work because the `smart_keyboard.json` file cannot be found.  Then try ::
+
+    python3 -m mindaffectBCI.online_bci --acquisition fakedata
+
+You will then be prompted to select a configuration file.  Navigate to the directory where `smart-keyboard` is installed and select the `smart_keyboard.json` file.
+
+If all is installed correctly, the BCI should start and you should see the `smart_keyboard` configuration screen, which looks like this.
+
+.. image:: docs/images/configure_screen.png
+   :width: 795
+   :height: 630
+   :scale: 50
+   :alt: Configuration screen of the keyboard
+
+Quickstart
+~~~~~~~~~~
+
+If the installation test was successfull, and you have a supported EEG amplifier.  You can now try a test with brain signals.  To do this:
+
+ 1. Modify the `smart_keyboard.json` configuration file to match your amplifier configuration.  See the mindaffectBCI docs for more information `here <https://mindaffect-bci.readthedocs.io/en/latest/goingfurther.html>`_ on how to configure for differnt types of amplifier.  (For an openBCI cyton, the current config should work 'out-of-the-box').
+ 2. Run the BCI with::
+
+    python3 -m mindaffectBCI.online_bci
+  3. In the file-selection window which opens select the `smart_keyboard.json` file which you configured in step 1.
 
 
-Before starting the keyboard app, the MindaffectBCI module needs to be running in the background. If you don't know how to do this, you can find a guide on the `PymindaffectBCI repository <https://github.com/mindaffect/pymindaffectBCI/tree/open_source>`_ . 
-    * Now, go back to the command prompt you've opened earlier and navigate to the *keyboard* directoy. 
-    * As the final step, run the following command:
-    
-
-        python bci_keyboard.py
+You should now be able to run a complete BCI system following the instructions outlined in the `user guide <https://github.com/mindaffect/smart-keyboard/blob/main/User%20Guide%20-%20BCI%20keyboard.pdf>`_
 
 
 Adding a configurable JSON keyboard
