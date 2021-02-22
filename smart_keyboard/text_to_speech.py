@@ -167,14 +167,19 @@ class TextToSpeech(object):
             message (str): The message.
         """
         service = self.determine_service()
+        # TODO[]: fall-back service if this fails!
+        offline_fallback = True
         try:
             self.name_to_function[service](message)     # Uses a dictionary to determine which function to use
+            offline_fallback = False
         except ValueError as ve:
             # This error occurs every once in a while, seemingly randomly.
             Logger.log_gTTS_value_error(ve)
-            self.say_offline(message)
         except PermissionError as e:
             pass
+        if offline_fallback:
+            print("Using OFFLINE Fallback!")
+            self.say_offline(message)
 
     def say_paid_online(self, message):
         """Uses Google Cloud WaveNet voice to speak the message.
@@ -186,11 +191,12 @@ class TextToSpeech(object):
 
         response = self.client.synthesize_speech(input=synthesis_input, voice=self.voice, audio_config=self.audio_config)
         try:
-            with open('tmp' + os.sep + 'ttsmessage.mp3', "wb") as out:
+            ttsfile = os.path.join(os.path.dirname(os.path.abspath(__file__)),'ttsmessage.mp3')
+            with open(ttsfile, "wb") as out:
                 # Write the response to the output file.
                 out.write(response.audio_content)
-            playsound('tmp' + os.sep + 'ttsmessage.mp3')
-            os.remove('tmp' + os.sep + 'ttsmessage.mp3')
+            playsound(ttsfile)
+            os.remove(ttsfile)
         except ValueError as ve:
             Logger.log_open_file_error()
 
@@ -202,13 +208,13 @@ class TextToSpeech(object):
         """
         try:
             tts = gTTS(message, lang=self.lang_tag)
+            ttsfile = os.path.join(os.path.dirname(os.path.abspath(__file__)),'ttsmessage.mp3')
+            tts.save(ttsfile)
+            playsound(ttsfile)
+            os.remove(ttsfile)
         except AssertionError as ae:
             # This happens when a TTS request is made without any input.
             Logger.log_no_tts_input()
-
-        tts.save('tmp' + os.sep + 'ttsmessage.mp3')
-        playsound('tmp' + os.sep + 'ttsmessage.mp3')
-        os.remove('tmp' + os.sep + 'ttsmessage.mp3')
 
     def say_offline(self, message):
         """Uses ``pyttsx3``  to speak a given message.
