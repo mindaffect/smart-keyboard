@@ -103,33 +103,10 @@ which works offline and is compatible with both Python 2 and 3.
 If there is a connection to the internet, Google's `gTTs <https://pypi.org/project/gTTS/>`_
 will be used.
 
-
-Installation
-------------
-Our module can be installed as follows.
-
-.. code-block:: python
-   
-   import everything
-   install(everything)
-
 Problems
 ~~~~~~~~
 First check if your Python version is not outdated and if all the required packages have
 been installed correctly (see Requirements).
-
-Add help here for possible problems that may arise with installation.
-
-
-Usage
------
-Show basic usage of our module.
-
-.. code-block:: python
-
-   import keyboard
-   print('wow look at how this works!')
-
 
 Authors and acknowledgment
 --------------------------
