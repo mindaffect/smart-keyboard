@@ -98,7 +98,10 @@ class SettingsManager:
 
     def write(self):
         """Writes updates to the user_config file."""
-        path = os.path.join("configs", "user_config.json")
+        if os.path.isdir("configs"):
+            path = os.path.join("configs", "user_config.json")
+        else:
+            path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"configs","user_config.json")
         with open(path, "w", encoding="utf-16") as jsonFile:
             json.dump(self.file, jsonFile, indent=2, ensure_ascii=False)
 
