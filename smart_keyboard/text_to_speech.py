@@ -117,6 +117,7 @@ class TextToSpeech(object):
         self.connection_timeout = connection_timeout
         # attaches this class to settings_manager
         self.settings_manager.attach(self)
+        self.basedirectory = os.path.dirname(os.path.abspath(__file__))
 
         if service == 'paid_online':
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'TTS-gcloud-credentials.json'
@@ -191,7 +192,7 @@ class TextToSpeech(object):
 
         response = self.client.synthesize_speech(input=synthesis_input, voice=self.voice, audio_config=self.audio_config)
         try:
-            ttsfile = os.path.join(os.path.dirname(os.path.abspath(__file__)),'ttsmessage.mp3')
+            ttsfile = os.path.join(self.basedirectory,'ttsmessage.mp3')
             with open(ttsfile, "wb") as out:
                 # Write the response to the output file.
                 out.write(response.audio_content)
@@ -208,7 +209,7 @@ class TextToSpeech(object):
         """
         try:
             tts = gTTS(message, lang=self.lang_tag)
-            ttsfile = os.path.join(os.path.dirname(os.path.abspath(__file__)),'ttsmessage.mp3')
+            ttsfile = os.path.join(self.basedirectory,'ttsmessage.mp3')
             tts.save(ttsfile)
             playsound(ttsfile)
             os.remove(ttsfile)

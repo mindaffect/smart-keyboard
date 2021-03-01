@@ -71,14 +71,11 @@ class CreateNgramFile:
         args = parser.parse_args()
 
         # Make sure there is a place to store the n-gram files
-        path = "dictionaries"                           # ./dictionaries
-        CreateNgramFile.ensure_path(path)
-        path1 = os.path.join(path, "ngram_files")       # ./dictionaries/ngram_files
-        CreateNgramFile.ensure_path(path1)
-        path1 = os.path.join(path1, "pretrained")       # ./dictionary/ngram_files/pretrained
-        CreateNgramFile.ensure_path(path1)
-        path2 = os.path.join(path, "frequency_lists")   # ./dictionaries/frequency_lists
-        CreateNgramFile.ensure_path(path2)
+        basedirectory = os.path.join(os.path.dirname(os.path.abspath(__file__)),"dictionaries")
+        CreateNgramFile.ensure_directory(basedirectory)
+        CreateNgramFile.ensure_directory(os.path.join(basedirectory,'ngram_files'))
+        CreateNgramFile.ensure_directory(os.path.join(basedirectory,'ngram_files','pretrained'))
+        CreateNgramFile.ensure_directory(os.path.join(os.path.join(basedirectory,'ngram_files','user_trained')))
 
         # Checking the given arguments' validity
         try:
@@ -108,7 +105,7 @@ class CreateNgramFile:
             exit()
 
         # Set output file name:
-        OUTPUT_NAME = os.path.join("dictionaries", "ngram_files", "pretrained", LANGUAGE + ".ngrams.json")
+        OUTPUT_NAME = os.path.join(basedirectory, "ngram_files", "pretrained", LANGUAGE + ".ngrams.json")
 
         if not os.path.isfile(OUTPUT_NAME):  # Output file does not exist yet
             print("N-gram frequency list does not exist yet. Creating new file \'" + OUTPUT_NAME + "\'.")
@@ -185,7 +182,7 @@ class CreateNgramFile:
 
         # If flag -dictionary is set, also generate a unigram frequency list for the word correction
         if args.dictionary:
-            path = os.path.join("dictionaries", "frequency_lists", LANGUAGE + ".txt")
+            path = os.path.join(basedirectory, "frequency_lists", LANGUAGE + ".txt")
             print("Creating frequency dictionary \'" + path + "\'")
             freq_file = ""
             if "" in ngrams:
@@ -201,9 +198,9 @@ class CreateNgramFile:
         print("Done!")
 
     @staticmethod
-    def ensure_path(path):
+    def ensure_directory(path):
         if not os.path.isdir(path):
-            print(os.path.join("Directory \'.", path) + " does not exist yet. Creating it now.")
+            print("Directory \'." + os.path.join(path) + "\' does not exist yet. Creating it now.")
             os.mkdir(path)
 
 

@@ -275,13 +275,14 @@ def run(symbols=None, keyboard_config:str="keyboard_config.json", user_config:st
 
     # Load the config files:
     # TODO[]: search for the config file location
+    basedirectory=os.path.dirname(os.path.abspath(__file__))
     if isinstance(keyboard_config,str):
         if not os.path.exists(keyboard_config):
-            keyboard_config = os.path.join(os.path.dirname(os.path.abspath(__file__)),"configs",keyboard_config)
+            keyboard_config = os.path.join(basedirectory,"configs",keyboard_config)
         keyboard_config = load_json(keyboard_config)
     if isinstance(user_config,str):
         if not os.path.exists(user_config):
-            user_config = os.path.join(os.path.dirname(os.path.abspath(__file__)),"configs",user_config)
+            user_config = os.path.join(basedirectory,"configs",user_config)
         user_config = load_json(user_config)
 
     if fullscreen is None: # override with argument

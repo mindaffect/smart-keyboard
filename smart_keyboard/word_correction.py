@@ -77,7 +77,7 @@ class WordCorrection:
             self.language = self.settings_manager.get_language()
 
             self.spell = SymSpell(max_dictionary_edit_distance=edit_distance)
-            self.spell.load_dictionary(os.path.join("dictionaries", "frequency_lists", self.language + ".txt"),
+            self.spell.load_dictionary(os.path.join(os.path.dirname(os.path.abspath(__file__)),"dictionaries", "frequency_lists", self.language + ".txt"),
                                        0, 1, encoding="utf-8")
 
     def update(self):
@@ -88,7 +88,7 @@ class WordCorrection:
             return
 
         self.language = new_lang
-        self.spell.load_dictionary(os.path.join("dictionaries", "frequency_lists", self.language + ".txt"),
+        self.spell.load_dictionary(os.path.join(os.path.dirname(os.path.abspath(__file__)),"dictionaries", "frequency_lists", self.language + ".txt"),
                                    0, 1, encoding="utf-8")
 
     def correct(self, word):

@@ -46,7 +46,8 @@ def check_dictionary(language):
     """
 
     # If the dictionary/frequency_lists folder does not exist yet, make it.
-    path = "dictionaries"
+    basedirectory = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+    path = os.path.join(basedirectory,"dictionaries")
     if not os.path.isdir(path):
         print(os.path.join("Directory \'.", path) + " does not exist yet. Creating it now.")
         os.mkdir(path)
@@ -57,7 +58,7 @@ def check_dictionary(language):
         os.mkdir(path)
 
     # If the dictionary for the language has not been downloaded yet, do it.
-    if not os.path.isfile(os.path.join("dictionaries", "frequency_lists", language + ".txt")):
+    if not os.path.isfile(os.path.join(basedirectory,"dictionaries", "frequency_lists", language + ".txt")):
         download(language=language, full=False)
 
 
@@ -82,7 +83,8 @@ def download(language, full):
         if resp.status_code != 200:
             print('Could not find a frequency list for ' + language, file=sys.stderr)
         else:
-            direct = os.path.join("dictionaries", "frequency_lists", language + '.txt')
+            basedirectory = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+            direct = os.path.join(basedirectory, "dictionaries", "frequency_lists", language + '.txt')
             with open(direct, 'wb') as file:
                 file.write(resp.content)
     except:

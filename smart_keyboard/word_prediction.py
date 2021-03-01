@@ -67,19 +67,16 @@ class WordPrediction:
             self.language = self.settings_manager.get_language()
 
             # Make sure there is a place to store the n-gram files
-            path = "dictionaries"                       # ./dictionaries
-            self.ensure_directory(path)
-            path = os.path.join(path, "ngram_files")    # ./dictionaries/ngram_files
-            self.ensure_directory(path)
-            path1 = os.path.join(path, "pretrained")    # ./dictionaries/ngram_files/pretrained
-            self.ensure_directory(path1)
-            path2 = os.path.join(path, "user_trained")  # ./dictionaries/ngram_files/user_trained
-            self.ensure_directory(path2)
+            self.basedirectory = os.path.join(os.path.dirname(os.path.abspath(__file__)),"dictionaries")
+            self.ensure_directory(self.basedirectory)
+            self.ensure_directory(os.path.join(self.basedirectory,'ngram_files'))
+            self.ensure_directory(os.path.join(self.basedirectory,'ngram_files','pretrained'))
+            self.ensure_directory(os.path.join(os.path.join(self.basedirectory,'ngram_files','user_trained')))
 
             # Load the n-gram frequency list for the specified language
-            self.pretrained_path = os.path.join("dictionaries", "ngram_files", "pretrained",
+            self.pretrained_path = os.path.join(self.basedirectory, "ngram_files", "pretrained",
                                                 self.language + ".ngrams.json")
-            self.user_trained_path = os.path.join("dictionaries", "ngram_files", "user_trained",
+            self.user_trained_path = os.path.join(self.basedirectory, "ngram_files", "user_trained",
                                                   self.language + ".ngrams.json")
             self.pretrained = self.load_ngrams(self.pretrained_path)
             self.user_trained = self.load_ngrams(self.user_trained_path)
@@ -111,8 +108,8 @@ class WordPrediction:
 
         self.language = new_lang
 
-        self.pretrained_path = os.path.join("dictionaries", "ngram_files", "pretrained", self.language + ".ngrams.json")
-        self.user_trained_path = os.path.join("dictionaries", "ngram_files", "user_trained",
+        self.pretrained_path = os.path.join(self.basedirectory, "ngram_files", "pretrained", self.language + ".ngrams.json")
+        self.user_trained_path = os.path.join(self.basedirectory, "ngram_files", "user_trained",
                                               self.language + ".ngrams.json")
         self.pretrained = self.load_ngrams(self.pretrained_path)
         self.user_trained = self.load_ngrams(self.user_trained_path)
@@ -143,7 +140,7 @@ class WordPrediction:
 
         self.user_trained["__max-depth__"] = max(self.user_trained["__max-depth__"], self.update_ngram_depth)
 
-        json.dump(self.user_trained, open(os.path.join("dictionaries", "ngram_files", "user_trained",
+        json.dump(self.user_trained, open(os.path.join(self.basedirectory, "ngram_files", "user_trained",
                                                        self.language + ".ngrams.json"), "w"))  # Update the file
 
     def predict(self, text="", n=3, depth=3, all=False):

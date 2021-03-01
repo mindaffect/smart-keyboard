@@ -78,6 +78,7 @@ class SettingsManager:
             self.language = self.file['settings']['language']
             self.text_size = self.file["settings"]["text_size"]
             self.word_prediction_correction = self.file["settings"]["word_prediction_correction"]
+            self.basedirectory = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
             if self.word_prediction_correction:
                 # Make sure that the dictionary for word correction is downloaded:
@@ -98,10 +99,7 @@ class SettingsManager:
 
     def write(self):
         """Writes updates to the user_config file."""
-        if os.path.isdir("configs"):
-            path = os.path.join("configs", "user_config.json")
-        else:
-            path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"configs","user_config.json")
+        path = os.path.join(self.basedirectory,"configs","user_config.json")
         with open(path, "w", encoding="utf-16") as jsonFile:
             json.dump(self.file, jsonFile, indent=2, ensure_ascii=False)
 
