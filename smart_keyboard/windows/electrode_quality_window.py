@@ -224,6 +224,19 @@ class ElectrodeQualityWindow(Window):
                     for t in self.dataringbuffer:
                         mu = median(t)
                         dataringbuffer.append([c - mu for c in t])
+                    
+                    # tail centering for plotting
+                    # compute average offset over the last 100 samples
+                    offset = [0 for _ in range(self.nch)]
+                    N = 0
+                    for t in dataringbuffer[-100:]:
+                        for i,c in enumerate(t):
+                            offset[i] = offset[i] + c
+                        N = N + 1
+                    offset = [ o/N for o in offset ]
+                    # subtract this offset
+                    for i,t in enumerate(dataringbuffer):
+                        dataringbuffer[i] = [c - offset[j] for j,c in enumerate(t)]
 
                     # ### END: Most of this code is from the selectionMatrix.py in Mindaffect's Project, adapted to fit
                     # our particular implementation: END ###
