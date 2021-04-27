@@ -10,6 +10,6 @@ setup(
     author='Thomas de Lange, Thomas Jurriaans, Damy Hillen, Joost Vossers, Jort Gutter, Florian Handke, Stijn Boosman',
     license='BSD-3',
     packages=find_packages(),
-    python_requires='>=3.7',
+    python_requires='>=3.6',
     install_requires=install_requires
 )
