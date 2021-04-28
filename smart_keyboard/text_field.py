@@ -70,10 +70,12 @@ class TextField:
         self.style_sheet = style_sheet
         self.settings_manager = SettingsManager.get_instance()
         self.text_size = self.settings_manager.get_text_size()
+        self.languageStyle = self.settings_manager.get_language_style()
         self.text_object = self.facade.create_text_field(size=(.9, 1 - self.style_sheet["keyboard_size"]),
                                                          pos=(.5, 0.02 + self.style_sheet["keyboard_size"]),
                                                          text_size=self.text_size,
-                                                         text_col=self.style_sheet["text_color"], align_vert='bottom')
+                                                         text_col=self.style_sheet["text_color"], align_vert='bottom',
+                                                         languageStyle=self.languageStyle)
         self.update_suggestions = update_suggestions
         self.predictor = predictor
 
