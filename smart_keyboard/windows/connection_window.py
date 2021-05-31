@@ -92,6 +92,13 @@ class ConnectionWindow(Window):
             pos=(.5, .5),
         )
 
+        self.logo = self.facade.create_icon(
+            "key_icons\MindAffect_Logo.png",
+            label_col=self.style["MA_orange"],
+            size=(.3,.3),
+            pos=(.95,.9),
+        )
+        
         self.current_phase = "waiting"
 
         self.phase_links = {
@@ -106,6 +113,7 @@ class ConnectionWindow(Window):
     def activate(self):
         """Activates the visual and functional elements of this Window."""
         self.facade.toggle_text_render(self.instruction, True)
+        self.facade.toggle_image_render(self.logo, True)
         self.timer = 600
         if self.use_flickering:
             self.attempt_connection()
@@ -113,6 +121,7 @@ class ConnectionWindow(Window):
     def deactivate(self):
         """Deactivates the visual and functional elements of this Window."""
         self.facade.toggle_text_render(self.instruction, False)
+        self.facade.toggle_image_render(self.logo, False)
 
     def draw(self, noisetag, last_flip_time, target_idx=-1):
         """

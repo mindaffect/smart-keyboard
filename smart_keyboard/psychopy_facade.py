@@ -268,6 +268,14 @@ class PsychopyFacade(FrameworkFacade):
             mode (bool): The bool that determines if the text object will be rendered or not
         """
         text_object.setAutoDraw(mode)
+        
+    def toggle_image_render(self, image_object, mode):
+        """Toggles the rendering of a psychopy image object
+        Args:
+            image_object (object): The image object to be toggled
+            mode (bool): The bool that determines if the text object will be rendered or not
+        """
+        image_object.setAutoDraw(mode)          
 
     def toggle_shape_render(self, shape_object, mode):
         """Toggles the rendering of a psychopy shape object

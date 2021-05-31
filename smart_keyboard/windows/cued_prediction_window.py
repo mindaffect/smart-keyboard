@@ -107,6 +107,12 @@ class CuedPredictionWindow(Window):
                 noisetag=noisetag
             )
         }
+        self.logo = self.facade.create_icon(
+            "key_icons\MindAffect_Logo.png",
+            label_col=self.style["MA_orange"],
+            size=(.3,.3),
+            pos=(.95,.9),
+        )        
 
         # Opto sensor square (upper-left corner of the screen):
         self.opto = facade.create_rect(
@@ -209,6 +215,7 @@ class CuedPredictionWindow(Window):
         self.text_field.activate()
         self.text_field.clear_text_field()
         self.facade.toggle_text_render(self.instruction, True)
+        self.facade.toggle_image_render(self.logo, True)
 
         if self.use_optometer:
             self.facade.toggle_shape_render(self.opto, True)
@@ -222,6 +229,7 @@ class CuedPredictionWindow(Window):
         """Deactivates all visual and functional elements of this Window."""
         self.is_active = False
         self.text_field.deactivate()
+        self.facade.toggle_image_render(self.logo, False)        
         self.facade.toggle_text_render(self.instruction, False)
         self.facade.toggle_shape_render(self.opto, False)
         self.windows[self.active_window].deactivate()
