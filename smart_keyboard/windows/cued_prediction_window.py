@@ -109,9 +109,9 @@ class CuedPredictionWindow(Window):
         }
         self.logo = self.facade.create_icon(
             "key_icons\MindAffect_Logo.png",
-            label_col=self.style["MA_orange"],
-            size=(.3,.3),
-            pos=(.95,.9),
+            label_col=self.style.get("MA_orange",(128,128,0)),
+            size=(.1,.1),
+            pos=(.95,.95),
         )        
 
         # Opto sensor square (upper-left corner of the screen):
@@ -148,7 +148,7 @@ class CuedPredictionWindow(Window):
         self.instruction = self.facade.create_text(
             text=self.instructions[self.current_phase],
             pos=(0.5, 0.95),
-            size=self.style['text_size'],
+            text_size=self.style['text_size'],
             col=self.style['text_color'],
             align_hor='center',
             align_vert='top'

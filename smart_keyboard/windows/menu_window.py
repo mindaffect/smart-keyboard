@@ -99,9 +99,9 @@ class MenuWindow(Window):
         
         self.logo = self.facade.create_icon(
             "key_icons\MindAffect_Logo.png",
-            label_col=self.style["MA_orange"],
-            size=(.3,.3),
-            pos=(.95,.1),
+            label_col=self.style.get("MA_orange",(128,128,0)),
+            size=(.1,.1),
+            pos=(.95,.05),
         )
         
         self.active_window = "GeneralMenu"

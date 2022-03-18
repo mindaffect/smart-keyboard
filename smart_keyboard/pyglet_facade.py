@@ -37,6 +37,7 @@ import pyglet
 from pyglet import shapes
 from smart_keyboard.app_exceptions import Logger
 from smart_keyboard.framework_facade import FrameworkFacade
+import os
 
 def flip_callback(self, application=None):
     '''pseudo method type which inserts a call-back after window flip for time-stamp recording'''
@@ -53,22 +54,24 @@ def on_text(text):
 
     Args:
         text (str): text entered into the window
-    """    
+    """
     global window
     window.last_text = text
 
 def on_mouse_motion(x, y, dx, dy):
     global window
+    #print("on_mouse_motion: {}".format((x,y,dx,dy)))
     window.last_mouse = (x,y,dx,dy)
 
 def on_mouse_press(x, y, button, modifiers):
     global window
+    print("on_mouse_press: {}".format((x,y,button,modifiers)))
     window.last_mouse_press = (x,y,button,modifiers)
 
 def on_mouse_release(x, y, button, modifiers):
     global window
+    print("on_mouse_release: {}".format((x,y,button,modifiers)))
     window.last_mouse_release = (x,y,button,modifiers)
-
 
 def initPyglet(fullscreen=False):
     '''intialize the pyglet window, keyhandlers, resize handlers etc.'''
@@ -81,7 +84,7 @@ def initPyglet(fullscreen=False):
             # N.B. over-sampling seems to introduce frame lagging on windows+Intell
             window = pyglet.window.Window(fullscreen=True, vsync=True, resizable=False, config=config)
         else:
-            window = pyglet.window.Window(width=1920, height=1080, vsync=True, resizable=True, config=config)
+            window = pyglet.window.Window(width=1024, height=786, vsync=True, resizable=True, config=config)
     except:
         print('Warning: anti-aliasing disabled')
         config = pyglet.gl.Config(double_buffer=True) 
@@ -122,6 +125,8 @@ class PygletFacade(FrameworkFacade):
         self.click_feedback_buttons = []
         self.batch = pyglet.graphics.Batch()
         self.group = None
+        self.application = None
+        self.nframe = 0
 
     def get_window(self):
         return self.window
@@ -146,7 +151,7 @@ class PygletFacade(FrameworkFacade):
         """
         button = self.create_rect(size, pos, button_color, line_color)
         if not has_icon:
-            button_label = self.create_text(label, label_color, pos)
+            button_label = self.create_text(label, label_color, pos, size=size)
         else:
             button_label = self.create_icon(label, label_color, size, pos)
         return button, button_label
@@ -155,7 +160,8 @@ class PygletFacade(FrameworkFacade):
         """Creates and returns a PsychoPy Rect(angle) object according to the passed arguments
 
         Args:
-            size ((float, float)): The width and height of the rectangle as a fraction of the window size
+            size ((float, float)): The width and height of the rectangle as a fraction of the window size. 
+               N.B. Rect is **symetric** about the pos!
             pos ((float, float)): The position of the centre of the rectangle, expressed as fractions of the window sizes
             color: ((int, int, int)): The color of the rectangle, in RGB format
             line_color ((int, int, int)): The color of the rectangle border, in RGB format
@@ -165,16 +171,21 @@ class PygletFacade(FrameworkFacade):
         """
         x,y = self.convert_pos(pos)
         w,h = self.convert_size(size)
-        rect = shapes.BorderedRectangle(x,y,w,h,border=3,color=self.convert_color(color),border_color=self.convert_color(line_color),batch=self.batch)
+        rect = shapes.Rectangle(x,y,width=w,height=h,
+                                color=self.convert_color(color),batch=self.batch)
+        rect.anchor_x, rect.anchor_y = w//2, h//2
+        rect.visible = False
+        #rect = shapes.BorderedRectangle(x,y,w,h,border=3,color=self.convert_color(color),border_color=self.convert_color(line_color),batch=self.batch)
         return rect
 
-    def create_text(self, text='', col=(255, 255, 255), pos=(0, 0), size=10, align_hor='center', align_vert='center', wrap_width=1):
+    def create_text(self, text='', col=(255, 255, 255), pos=(0, 0), size=(1,1), text_size=10, align_hor='center', align_vert='center', wrap_width=1):
         """Creates and returns a psychopy Text object, centered at the passed position
 
         Args:
             text (string): The text
             col: ((int, int, int)): text color in RGB format
             pos ((float, float)): Position of the text on the screen, expressed as two fractions relative to window dimensions
+            size (())
             text_size (int): Text size
             align_hor (string): Horizontal alignment of the text ('left', 'right' or 'center')
             align_vert (string): Vertical alignment of the text ('top', 'bottom' or 'center')
@@ -185,10 +196,14 @@ class PygletFacade(FrameworkFacade):
 
         """
         x,y=self.convert_pos(pos)
-        text = pyglet.text.Label(text, font_size=size, x=x, y=y, w=wrap_width,
-                                color=self.convert_color(col),
-                                anchor_x=align_hor, anchor_y=align_vert,
+        w,h=self.convert_size(size)
+        text = pyglet.text.Label(str(text), font_size=text_size, 
+                                x=x, y=y, #width=w, height=h,
+                                color=self.convert_text_color(col,0),
+                                #anchor_x=align_hor, #anchor_y=align_vert, 
+                                anchor_x='center', anchor_y='center',
                                 batch=self.batch, group=self.group)
+        text.visible = False
         # text = visual.TextStim(self.window, text=text, pos=self.convert_pos(pos), color=self.convert_color(col),
         #                        depth=-1, height=size/100, alignText=align_hor, anchorVert=align_vert,
         #                        wrapWidth=wrap_width)
@@ -198,7 +213,7 @@ class PygletFacade(FrameworkFacade):
     def add_click_feedback(self, key):
         self.click_feedback_buttons.append(key)
 
-    def create_text_field(self, size, pos, text_size, text_col, align_hor='left', align_vert='top', text=''):
+    def create_text_field(self, size, pos, text_size, text_col, align_hor='left', align_vert='top', text='', languageStyle:str=None):
         """Creates and returns a psychopy Text object, the upper left corner aligned to the given position
         
         Args:
@@ -209,6 +224,7 @@ class PygletFacade(FrameworkFacade):
             align_hor (string): Horizontal alignment of the textfield ('left', 'right' or 'center')
             align_vert (string): Vertical alignment of the text ('top', 'bottom' or 'center')
             text (string): The text to be displayed
+            languageStyle (): ????
 
         Returns:
             (visual.TextStim): A psychopy text object
@@ -226,10 +242,15 @@ class PygletFacade(FrameworkFacade):
         # return textfield
         x,y=self.convert_pos(pos)
         w,h=self.convert_size(size)
-        text = pyglet.text.Label(text, font_size=text_size, x=x, y=y, w=w, h=h,
-                                color=self.convert_color(text_col),
-                                anchor_x=align_hor, anchor_y=align_vert,
+        # TODO[]: use the language style info
+        text = pyglet.text.Label(text, font_size=text_size, 
+                                x=x, y=y, width=w, height=h,
+                                color=self.convert_text_color(text_col,0),
+                                anchor_x='center', anchor_y='center',
+                                multiline=True,
+                                #anchor_x=align_hor, #anchor_y=align_vert,
                                 batch=self.batch, group=self.group)
+        text.visible = False
         return text
 
     def create_icon(self, file, label_col, size, pos):
@@ -238,7 +259,7 @@ class PygletFacade(FrameworkFacade):
         Args:
             file (str): Path to png file used as icon.
             label_col (tuple): The color to be used for the icon in RGB format.
-            size (tuple): Size of the icon.
+            size (tuple): Size of the icon.  N.B. size is anchored on the center of the square
             pos (tuple): Position of the icon (centered).
 
         Returns
@@ -247,11 +268,17 @@ class PygletFacade(FrameworkFacade):
         """
         x,y=self.convert_pos(pos)
         w,h=self.convert_size(size)
-        icon = pyglet.sprite.Sprite(file,w,h,
+        if not os.path.exists(file):
+            file = os.path.join(os.path.dirname(__file__),file)
+        img = pyglet.image.load(file)
+        img.anchor_x, img.anchor_y  = (img.width//2,img.height//2)
+        icon = pyglet.sprite.Sprite(img,x,y,
                                     batch=self.batch, group=self.group)
-        icon.update(color=self.convert_color(label_col),
-                    scale_x=w/icon.width, 
-                    scale_y=h/icon.height)
+        # N.B. Sprites set color and alpha separately
+        icon.color = self.convert_color(label_col)
+        icon.update(scale_x=w/icon.image.width, 
+                    scale_y=h/icon.image.height)
+        icon.visible = False
         return icon
 
     def create_line(self, vertices, color):
@@ -269,6 +296,7 @@ class PygletFacade(FrameworkFacade):
         vertices = [(self.convert_pos(v)) for v in vertices]
         line = shapes.Line(vertices[0][0],vertices[0][1],vertices[1][0],vertices[1][1],
                             color=self.convert_color(color))
+        line.visible = False
         return line
 
     def set_text(self, text_object, new_text):
@@ -280,7 +308,7 @@ class PygletFacade(FrameworkFacade):
 
         """
         text_object.begin_update()
-        text_object.text=new_text
+        text_object.text=str(new_text)
         text_object.end_update()
 
     def set_text_size(self, text_object, text_size):
@@ -296,11 +324,11 @@ class PygletFacade(FrameworkFacade):
 
     def change_button_color(self, shape, new_color):
         """Changes the color of the ShapeStim"""
-        shape.color = self.convert_color(new_color)
+        shape.color = self.convert_color(new_color)[:3]
 
     def set_line_color(self, shape, line_color):
         """Sets the border color of the specified shape to the provided line_color"""
-        shape.border_color = self.convert_color(line_color)
+        shape.border_color = self.convert_color(line_color)[:3]
 
     def toggle_text_render(self, text_object, mode):
         """Toggles the rendering of a psychopy text object
@@ -309,6 +337,11 @@ class PygletFacade(FrameworkFacade):
             text_object (object): The text object to be toggled
             mode (bool): The bool that determines if the text object will be rendered or not
         """
+        if isinstance(text_object,pyglet.text.Label):
+            if not mode and text_object.visible:
+                text_object.color = tuple(text_object.color[:3]) + (0,)
+            elif mode and not text_object.visible:
+                text_object.color = tuple(text_object.color[:3]) + (255,)
         text_object.visible = mode
 
     def toggle_shape_render(self, shape_object, mode):
@@ -320,8 +353,18 @@ class PygletFacade(FrameworkFacade):
         """
         shape_object.visible = mode
 
-    def isposinrect(x,y,rx,ry,rw,rh):
-        return rx < x & x < rx+rw & ry < y & y < ry + rh
+    def toggle_image_render(self, image_object, mode):
+        """Toggles the rendering of a psychopy shape object
+
+        Args:
+            shape_object (visual.ShapeStim): The shape object to be toggled
+            mode (bool): The bool that determines if the text object will be rendered or not
+        """
+        image_object.visible = mode
+
+
+    def isposinrect(self,x,y,rx,ry,rw,rh):
+        return rx-rw//2 < x and x < rx+rw//2 and ry-rh//2 < y and y < ry + rh//2
 
     def button_mouse_event(self, button, mouse_buttons=[0, 1, 2]):
         """Returns `True` if the mouse is currently inside the button and
@@ -338,8 +381,9 @@ class PygletFacade(FrameworkFacade):
 
         """
         # TODO[]: filter on the button pressed
-        mx,my,mb = self.window.last_mouse_release
-        return self.isposinrect(mx,my,button.x,button.y,button.w,button.h)
+        if self.window.last_mouse_release is None: return False
+        mx,my,mb,mm = self.window.last_mouse_release
+        return self.isposinrect(mx,my,button.x,button.y,button.width,button.height)
 
     def mouse_event(self, mouse_buttons):
         """Returns `True` if all passed buttons are currently pressed
@@ -352,11 +396,9 @@ class PygletFacade(FrameworkFacade):
 
         """
         # TODO[]: Huh?
-        mx,my,buttons = self.window.last_mouse_release
-        for button in mouse_buttons:
-            if not buttons[button]:
-                return False
-        return True
+        if self.window.last_mouse_release is None: return False
+        mx,my,button,modifiers = self.window.last_mouse_release
+        return button in mouse_buttons
 
     def key_event(self, key_list=None):
         """Returns a list of keys that are pressed
@@ -368,7 +410,7 @@ class PygletFacade(FrameworkFacade):
             list: a list of pressed keys
 
         """
-        return self.window.last_key_pressed
+        return self.window.last_key_press
 
     def convert_pos(self, pos):
         """Converts a position expressed in fractions of the window dimensions (between 0 and 1) into
@@ -418,8 +460,7 @@ class PygletFacade(FrameworkFacade):
         return self.convert_size(icon_size)
 
     def convert_color(self, col):
-        """Converts a n RGB color (an int of 0 to 255 for each channel) into the psychopy format
-        (a float between -1 and 1 for each channel)
+        """Converts a n RGB color (an int of 0 to 255 for each channel) into the pyglet format, which must have an alpha channel
 
         Args:
             col ((int, int, int): A color passed in the RGB format
@@ -429,9 +470,25 @@ class PygletFacade(FrameworkFacade):
 
         """
         # return col[0]/127.5 - 1, col[1]/127.5 - 1, col[2]/127.5 - 1
+        #if len(col)==3: col= tuple(col)+(255,)
         return col
 
-    def draw(self, application):
+    def convert_text_color(self, col, alpha=255):
+        """Converts a n RGB color (an int of 0 to 255 for each channel) into the pyglet format, which must have an alpha channel
+
+        Args:
+            col ((int, int, int): A color passed in the RGB format
+
+        Returns:
+            ((float, float, float)): The converted color
+
+        """
+        # return col[0]/127.5 - 1, col[1]/127.5 - 1, col[2]/127.5 - 1
+        if len(col)==3: col= tuple(col)+(alpha,)
+        return col
+
+
+    def draw(self, t, *args):
         """draws all active shapes and objects to the frame buffer
 
         Args:
@@ -445,9 +502,16 @@ class PygletFacade(FrameworkFacade):
             else:
                 key.pressed_frames -= 1
         self.nframe = self.nframe + 1
-        application.draw()
+        self.window.clear()
+        self.application.handle_mouse_events()
+        self.application.draw()
         # finally draw the actual batch
         self.batch.draw()
+        # clear the UI state
+        self.window.last_key_press=None
+        self.window.last_mouse_press=None
+        self.window.last_mouse_release=None
+        self.window.last_mouse_motion=None
 
     def start(self, application, exit_keys):
         """Starts and runs the event loop
@@ -456,6 +520,9 @@ class PygletFacade(FrameworkFacade):
             application (bci_keyboard.Application): The application to run
             exit_keys (list): A list of key names, which, if pressed will terminate the application
         """
+
+        self.application = application
+        self.nframe = 0
 
         # setup a key press handler, just store key-press in global variable
         self.window.push_handlers(on_key_press, on_text, on_mouse_press, on_mouse_release, on_mouse_motion)
@@ -468,10 +535,10 @@ class PygletFacade(FrameworkFacade):
         # override window's flip method to record the exact *time* the
         # flip happended
         import types
-        self.window.flip = types.MethodType(flip_callback, window, application)
+        self.window.flip = types.MethodType(lambda self: flip_callback(self,application), self.window)
 
         # call the draw method as fast as possible, i.e. at video frame rate!
-        pyglet.clock.schedule(self.draw,application)
+        pyglet.clock.schedule(self.draw)
         # mainloop
         pyglet.app.run()
         pyglet.app.EventLoop().exit()

@@ -43,6 +43,7 @@ An ``Application`` has the following two layouts:
 
 from mindaffectBCI.noisetag import Noisetag
 from smart_keyboard.psychopy_facade import PsychopyFacade
+from smart_keyboard.pyglet_facade import PygletFacade
 from smart_keyboard.windows.connection_window import ConnectionWindow
 from smart_keyboard.windows.menu_window import MenuWindow
 from smart_keyboard.windows.cued_prediction_window import CuedPredictionWindow
@@ -114,7 +115,7 @@ class Application:
         self.active_window = "Connection"
         self.windows[self.active_window].activate()
 
-    def build_windows(self, connection_window, use_flickering):
+    def build_windows(self, connection_window, use_flickering, start_window="Menu"):
         """
         This function is called from an instance of ConnectionWindow and builds all required windows for the application
         to run.
@@ -134,7 +135,8 @@ class Application:
             self.noisetag.addSelectionHandler(self.selection_handler)
 
         # Building of the required Windows:
-        try:
+        #try:
+        if 1:
             self.windows = {
                 "Menu": MenuWindow(
                     parent=self,
@@ -184,19 +186,22 @@ class Application:
                     noisetag=self.noisetag,
                 )
             }
-        except KeyError as exc:
-            # Triggers if a key in the config file is spelled incorrectly, e.g. 'keyboard1' won't be found by 'keyboard'
-            Logger.log_config_key_error()
-        except Exception as exc:
-            Logger.log_config_error()
-        else:
+        # except KeyError as exc:
+        #     # Triggers if a key in the config file is spelled incorrectly, e.g. 'keyboard1' won't be found by 'keyboard'
+        #     Logger.log_config_key_error()
+        # except Exception as exc:
+        #     Logger.log_config_error()
+        if 1:
+        # else:
             # Triggers if no exception is triggered
 
             # Deactivates the ConnectionWindow:
             connection_window.deactivate()
 
-            self.windows["Menu"].activate()
-            self.active_window = "Menu"
+            # start_window='Calibration'
+
+            self.windows[start_window].activate()
+            self.active_window = start_window
 
     def setup_noisetag(self):
         """Sets up a Noisetag object to communicate with the Utopia server."""
@@ -303,8 +308,15 @@ def run(symbols=None, keyboard_config:str="keyboard_config.json", user_config:st
     if not host is None:
         user_config['host']=host
 
-    try:
-        facade = PsychopyFacade(
+    #try:
+    if 1:
+        # facade = PsychopyFacade(
+        #     size=user_config["screen_dimensions"],
+        #     full_screen=fullscreen,
+        #     wait_blanking=keyboard_config["wait_blanking"]
+        # )
+
+        facade = PygletFacade(
             size=user_config["screen_dimensions"],
             full_screen=fullscreen,
             wait_blanking=keyboard_config["wait_blanking"]
@@ -319,10 +331,10 @@ def run(symbols=None, keyboard_config:str="keyboard_config.json", user_config:st
         # Event-loop:
         facade.start(application, keyboard_config["exit_keys"])
 
-    except KeyError as exc:
-        Logger.log_config_key_error()
-    except Exception as exc:
-        Logger.log_config_error()
+    # except KeyError as exc:
+    #     Logger.log_config_key_error()
+    # except Exception as exc:
+    #     Logger.log_config_error()
 
 
 if __name__ == "__main__":

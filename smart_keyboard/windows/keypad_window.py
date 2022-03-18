@@ -172,6 +172,8 @@ class KeypadWindow(Window):
                 key_type = KeyType[key[0]]
                 key_label = key[1]
 
+                print('{}) {} {},{},  {},{}'.format(i,key_label, pos[0], pos[1], size[0], size[1]))
+
                 keys.append(Key(self.facade, key_type, size, pos, key_label, self.button_color,
                                 self.line_color, self.label_color))
 
