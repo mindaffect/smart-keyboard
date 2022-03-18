@@ -236,7 +236,7 @@ class Application:
         self.windows[self.active_window].draw(self.noisetag, self.last_flip_time)
 
     def set_flip_time(self):
-        """Updates the last flip time."""
+        """call-back immeadiately after flip to record the flip-time."""
         if self.use_flickering:
             self.last_flip_time = self.noisetag.getTimeStamp()
 

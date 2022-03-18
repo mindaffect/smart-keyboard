@@ -1,6 +1,6 @@
-"""This module is used as a facade between the bci keyboard and the psychopy framework.
+"""This module is used as a facade between the bci keyboard and the pyglet framework.
 
-This module contains a single class ``PsychopyFacade``.
+This module contains a single class ``PygletFacade``.
 
 """
 
@@ -33,16 +33,78 @@ This module contains a single class ``PsychopyFacade``.
 #  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from psychopy import core, visual, event
+import pyglet
+from pyglet import shapes
 from smart_keyboard.app_exceptions import Logger
 from smart_keyboard.framework_facade import FrameworkFacade
-from pathlib import Path
-import cv2
-import os
-import re as regex
+
+def flip_callback(self, application=None):
+    '''pseudo method type which inserts a call-back after window flip for time-stamp recording'''
+    type(self).flip(self)
+    if application: application.set_flip_time()
+
+def on_key_press(symbols, modifiers):
+    '''main key-press handler, which stores the last key in a global variable'''
+    global window
+    window.last_key_press=symbols
+
+def on_text(text):
+    """handler for text input
+
+    Args:
+        text (str): text entered into the window
+    """    
+    global window
+    window.last_text = text
+
+def on_mouse_motion(x, y, dx, dy):
+    global window
+    window.last_mouse = (x,y,dx,dy)
+
+def on_mouse_press(x, y, button, modifiers):
+    global window
+    window.last_mouse_press = (x,y,button,modifiers)
+
+def on_mouse_release(x, y, button, modifiers):
+    global window
+    window.last_mouse_release = (x,y,button,modifiers)
 
 
-class PsychopyFacade(FrameworkFacade):
+def initPyglet(fullscreen=False):
+    '''intialize the pyglet window, keyhandlers, resize handlers etc.'''
+    global window
+    # set up the window
+    try:
+        config = pyglet.gl.Config(double_buffer=True, sample_buffers=1, samples=4)
+        if fullscreen:
+            # N.B. accurate video timing only guaranteed with fullscreen
+            # N.B. over-sampling seems to introduce frame lagging on windows+Intell
+            window = pyglet.window.Window(fullscreen=True, vsync=True, resizable=False, config=config)
+        else:
+            window = pyglet.window.Window(width=1920, height=1080, vsync=True, resizable=True, config=config)
+    except:
+        print('Warning: anti-aliasing disabled')
+        config = pyglet.gl.Config(double_buffer=True) 
+        if fullscreen:
+            print('Fullscreen mode!')
+            # N.B. accurate video timing only guaranteed with fullscreen
+            # N.B. over-sampling seems to introduce frame lagging on windows+Intell
+            window = pyglet.window.Window(fullscreen=True, vsync=True, resizable=False, config=config)
+            #width=1280, height=720, 
+        else:
+            window = pyglet.window.Window(width=1920, height=1080, vsync=True, resizable=True, config=config)
+
+    # setup alpha blending
+    pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+    pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
+    # setup anti-aliasing on lines
+    pyglet.gl.glEnable(pyglet.gl.GL_LINE_SMOOTH)                                                     
+    pyglet.gl.glHint(pyglet.gl.GL_LINE_SMOOTH_HINT, pyglet.gl.GL_DONT_CARE)
+
+    return window
+
+
+class PygletFacade(FrameworkFacade):
     """Implements the psychopy functionality into the facade.
 
     Args:
@@ -55,19 +117,11 @@ class PsychopyFacade(FrameworkFacade):
     """
 
     def __init__(self, size, wait_blanking=True, full_screen=False):
-        self.window = visual.Window(
-            size=size,
-            color=(-1, -1, -1),
-            fullscr=full_screen,
-            checkTiming=True,
-            waitBlanking=wait_blanking,
-            winType='pyglet'
-        )
-        self.window.recordFrameIntervals = True
-        # set threshold for frame duration:
-        self.window.refreshThreshold = 1 / 60 + 0.004
-        self.mouse = event.Mouse(win=self.window)
+        self.window = initPyglet(fullscreen=full_screen)
+        self.mouse = self.window
         self.click_feedback_buttons = []
+        self.batch = pyglet.graphics.Batch()
+        self.group = None
 
     def get_window(self):
         return self.window
@@ -109,9 +163,9 @@ class PsychopyFacade(FrameworkFacade):
         Returns:
             (visual.Rect): A psychopy rectangle object
         """
-        rect = visual.Rect(self.window, size=self.convert_size(size), pos=self.convert_pos(pos),
-                           fillColor=self.convert_color(color), lineColor=self.convert_color(line_color),
-                           lineWidth=3)
+        x,y = self.convert_pos(pos)
+        w,h = self.convert_size(size)
+        rect = shapes.BorderedRectangle(x,y,w,h,border=3,color=self.convert_color(color),border_color=self.convert_color(line_color),batch=self.batch)
         return rect
 
     def create_text(self, text='', col=(255, 255, 255), pos=(0, 0), size=10, align_hor='center', align_vert='center', wrap_width=1):
@@ -121,7 +175,7 @@ class PsychopyFacade(FrameworkFacade):
             text (string): The text
             col: ((int, int, int)): text color in RGB format
             pos ((float, float)): Position of the text on the screen, expressed as two fractions relative to window dimensions
-            size (int): Text size
+            text_size (int): Text size
             align_hor (string): Horizontal alignment of the text ('left', 'right' or 'center')
             align_vert (string): Vertical alignment of the text ('top', 'bottom' or 'center')
             wrap_width (float): the maximal horizontal width of the text; it will wrap to a newline at this point
@@ -130,16 +184,21 @@ class PsychopyFacade(FrameworkFacade):
             (visual.TextStim): A psychopy text object
 
         """
-        text = visual.TextStim(self.window, text=text, pos=self.convert_pos(pos), color=self.convert_color(col),
-                               depth=-1, height=size/100, alignText=align_hor, anchorVert=align_vert,
-                               wrapWidth=wrap_width)
-        text.setAutoDraw(False)
+        x,y=self.convert_pos(pos)
+        text = pyglet.text.Label(text, font_size=size, x=x, y=y, w=wrap_width,
+                                color=self.convert_color(col),
+                                anchor_x=align_hor, anchor_y=align_vert,
+                                batch=self.batch, group=self.group)
+        # text = visual.TextStim(self.window, text=text, pos=self.convert_pos(pos), color=self.convert_color(col),
+        #                        depth=-1, height=size/100, alignText=align_hor, anchorVert=align_vert,
+        #                        wrapWidth=wrap_width)
+        # text.setAutoDraw(False)
         return text
 
     def add_click_feedback(self, key):
         self.click_feedback_buttons.append(key)
 
-    def create_text_field(self, size, pos, text_size, text_col, align_hor='left', align_vert='top', text='',languageStyle='LTR'):
+    def create_text_field(self, size, pos, text_size, text_col, align_hor='left', align_vert='top', text=''):
         """Creates and returns a psychopy Text object, the upper left corner aligned to the given position
         
         Args:
@@ -155,17 +214,23 @@ class PsychopyFacade(FrameworkFacade):
             (visual.TextStim): A psychopy text object
 
         """
-        textfield = visual.TextStim(
-            self.window,
-            text=text,
-            pos=self.convert_pos(pos),
-            color=self.convert_color(text_col), depth=-1, height=text_size/100,
-            alignText=align_hor, anchorVert=align_vert,
-            wrapWidth=self.convert_size((size[0], 0))[0],
-            languageStyle=languageStyle
-        )
-        textfield.autoDraw = False
-        return textfield
+        # textfield = visual.TextStim(
+        #     self.window,
+        #     text=text,
+        #     pos=self.convert_pos(pos),
+        #     color=self.convert_color(text_col), depth=-1, height=text_size/100,
+        #     alignText=align_hor, anchorVert=align_vert,
+        #     wrapWidth=self.convert_size((size[0], 0))[0]
+        # )
+        # textfield.autoDraw = False
+        # return textfield
+        x,y=self.convert_pos(pos)
+        w,h=self.convert_size(size)
+        text = pyglet.text.Label(text, font_size=text_size, x=x, y=y, w=w, h=h,
+                                color=self.convert_color(text_col),
+                                anchor_x=align_hor, anchor_y=align_vert,
+                                batch=self.batch, group=self.group)
+        return text
 
     def create_icon(self, file, label_col, size, pos):
         """Creates and returns a psychopy image object.
@@ -180,42 +245,13 @@ class PsychopyFacade(FrameworkFacade):
             (visual.ImageStim): A psychopy image object
 
         """
-        try:
-            # reverse RGB to BGR for use in cv2:
-            fill_color = [label_col[2], label_col[1], label_col[0]]
-            # Fix incorrect path separator for non-Windows systems:
-            file = os.path.normpath(file)
-            if not os.path.exists(file):
-                file = os.path.join(os.path.dirname(os.path.abspath(__file__)),file)
-            # read original image:
-            img = cv2.imread(file, -1)
-            # split into separate channels:
-            B, G, R, A = cv2.split(img)
-            # merge color channels back into a single image:
-            edited_no_alpha = cv2.merge((B, G, R))
-            # set all pixels to the specified color:
-            edited_no_alpha[True] = fill_color
-            # split into separate channels again:
-            B, G, R, = cv2.split(edited_no_alpha)
-            # merge with the alpha channel back into a single image:
-            edited_with_alpha = cv2.merge((B, G, R, A))
-            # split the file extension from path/file name:
-            path_parts = file.split('.')
-            # add '_recolored' to the file name:
-            path_parts[-2] += '_recolored'
-            # join everything back together:
-            updated_file = '.'.join(path_parts)
-            print("Writing file to: {}".format(updated_file))
-            # save the edited image as copy under the new file name:
-            cv2.imwrite(updated_file, edited_with_alpha)
-            # load recolored copy as icon:
-            icon = visual.ImageStim(self.window, image=updated_file, size=self.convert_to_icon_size(size, 0.5), pos=self.convert_pos(pos), depth=-1)
-            # delete recolored file:
-            if os.path.exists(updated_file):
-                os.remove(updated_file)
-        except IOError:
-            Logger.log_unknown_icon(file)
-            icon = self.create_text(file, label_col, pos)
+        x,y=self.convert_pos(pos)
+        w,h=self.convert_size(size)
+        icon = pyglet.sprite.Sprite(file,w,h,
+                                    batch=self.batch, group=self.group)
+        icon.update(color=self.convert_color(label_col),
+                    scale_x=w/icon.width, 
+                    scale_y=h/icon.height)
         return icon
 
     def create_line(self, vertices, color):
@@ -231,7 +267,9 @@ class PsychopyFacade(FrameworkFacade):
 
         """
         vertices = [(self.convert_pos(v)) for v in vertices]
-        return visual.ShapeStim(self.window, closeShape=False, vertices=vertices, autoDraw=False, lineColor=color)
+        line = shapes.Line(vertices[0][0],vertices[0][1],vertices[1][0],vertices[1][1],
+                            color=self.convert_color(color))
+        return line
 
     def set_text(self, text_object, new_text):
         """Changes the displayed text of a psychopy text object
@@ -241,7 +279,9 @@ class PsychopyFacade(FrameworkFacade):
             new_text (str): The new text
 
         """
-        text_object.text = new_text
+        text_object.begin_update()
+        text_object.text=new_text
+        text_object.end_update()
 
     def set_text_size(self, text_object, text_size):
         """Sets the text size of the passed text_object.
@@ -250,15 +290,17 @@ class PsychopyFacade(FrameworkFacade):
             text_object (Object): A reference to the to be changed text object
             text_size (int): The size of the text.
         """
-        text_object.setHeight(text_size/100)
+        text_object.begin_update()
+        text_object.h = text_size/100
+        text_object.end_update()
 
     def change_button_color(self, shape, new_color):
         """Changes the color of the ShapeStim"""
-        shape.fillColor = self.convert_color(new_color)
+        shape.color = self.convert_color(new_color)
 
     def set_line_color(self, shape, line_color):
         """Sets the border color of the specified shape to the provided line_color"""
-        shape.lineColor = self.convert_color(line_color)
+        shape.border_color = self.convert_color(line_color)
 
     def toggle_text_render(self, text_object, mode):
         """Toggles the rendering of a psychopy text object
@@ -267,15 +309,7 @@ class PsychopyFacade(FrameworkFacade):
             text_object (object): The text object to be toggled
             mode (bool): The bool that determines if the text object will be rendered or not
         """
-        text_object.setAutoDraw(mode)
-        
-    def toggle_image_render(self, image_object, mode):
-        """Toggles the rendering of a psychopy image object
-        Args:
-            image_object (object): The image object to be toggled
-            mode (bool): The bool that determines if the text object will be rendered or not
-        """
-        image_object.setAutoDraw(mode)          
+        text_object.visible = mode
 
     def toggle_shape_render(self, shape_object, mode):
         """Toggles the rendering of a psychopy shape object
@@ -284,7 +318,10 @@ class PsychopyFacade(FrameworkFacade):
             shape_object (visual.ShapeStim): The shape object to be toggled
             mode (bool): The bool that determines if the text object will be rendered or not
         """
-        shape_object.autoDraw = mode
+        shape_object.visible = mode
+
+    def isposinrect(x,y,rx,ry,rw,rh):
+        return rx < x & x < rx+rw & ry < y & y < ry + rh
 
     def button_mouse_event(self, button, mouse_buttons=[0, 1, 2]):
         """Returns `True` if the mouse is currently inside the button and
@@ -300,7 +337,9 @@ class PsychopyFacade(FrameworkFacade):
             (bool): Whether there was a mouse press with any of the given buttons on the passed object
 
         """
-        return self.mouse.isPressedIn(button, buttons=mouse_buttons)
+        # TODO[]: filter on the button pressed
+        mx,my,mb = self.window.last_mouse_release
+        return self.isposinrect(mx,my,button.x,button.y,button.w,button.h)
 
     def mouse_event(self, mouse_buttons):
         """Returns `True` if all passed buttons are currently pressed
@@ -312,7 +351,8 @@ class PsychopyFacade(FrameworkFacade):
             (bool): `True` if all passed mouse_buttons are pressed, `False` otherwise
 
         """
-        buttons = self.mouse.getPressed()
+        # TODO[]: Huh?
+        mx,my,buttons = self.window.last_mouse_release
         for button in mouse_buttons:
             if not buttons[button]:
                 return False
@@ -328,12 +368,11 @@ class PsychopyFacade(FrameworkFacade):
             list: a list of pressed keys
 
         """
-        keys = event.getKeys(keyList=key_list)
-        return keys
+        return self.window.last_key_pressed
 
     def convert_pos(self, pos):
         """Converts a position expressed in fractions of the window dimensions (between 0 and 1) into
-        the psychopy coordinate system (between -1 and 1)
+        the pyglet coordinate system (pixels)
 
         Args:
             pos ((float, float)): A position passed as a tuple of two fractions
@@ -342,11 +381,12 @@ class PsychopyFacade(FrameworkFacade):
             ((float, float)): The converted positions
 
         """
-        return pos[0] * 2 - 1, pos[1] * 2 - 1
+        w,h=self.window.width,self.window.height
+        return int(pos[0] * w), int(pos[1] * h)
 
     def convert_size(self, size):
         """Converts a size tuple expressed in fractions of the window dimensions (between 0 and 1) into
-        the psychopy coordinate system (between -1 and 1)
+        the pyglet coordinate system pixels
 
         Args:
             size ((float, float)): A size passed as a tuple of two fractions
@@ -355,7 +395,7 @@ class PsychopyFacade(FrameworkFacade):
             ((float, float)): The converted size
 
         """
-        return size[0] * 2, size[1] * 2
+        return self.convert_pos(size)
 
     def convert_to_icon_size(self, size, scale=1.0):
         """Converts given size to the size used for creating the icon.
@@ -388,7 +428,8 @@ class PsychopyFacade(FrameworkFacade):
             ((float, float, float)): The converted color
 
         """
-        return col[0]/127.5 - 1, col[1]/127.5 - 1, col[2]/127.5 - 1
+        # return col[0]/127.5 - 1, col[1]/127.5 - 1, col[2]/127.5 - 1
+        return col
 
     def draw(self, application):
         """draws all active shapes and objects to the frame buffer
@@ -403,7 +444,10 @@ class PsychopyFacade(FrameworkFacade):
                 key.reset_color()
             else:
                 key.pressed_frames -= 1
+        self.nframe = self.nframe + 1
         application.draw()
+        # finally draw the actual batch
+        self.batch.draw()
 
     def start(self, application, exit_keys):
         """Starts and runs the event loop
@@ -412,13 +456,26 @@ class PsychopyFacade(FrameworkFacade):
             application (bci_keyboard.Application): The application to run
             exit_keys (list): A list of key names, which, if pressed will terminate the application
         """
-        while True:
-            self.draw(application)
-            application.handle_mouse_events()
-            self.flip()
-            application.set_flip_time() # flip-time recording callback
-            if self.quit(exit_keys):  # press 'Q'(uit) or Escape to close the application
-                break
+
+        # setup a key press handler, just store key-press in global variable
+        self.window.push_handlers(on_key_press, on_text, on_mouse_press, on_mouse_release, on_mouse_motion)
+        self.window.last_key_press=None
+        self.window.last_text=None
+        self.window.last_mouse_press=None
+        self.window.last_mouse_release=None
+        self.window.last_mouse_motion=None
+
+        # override window's flip method to record the exact *time* the
+        # flip happended
+        import types
+        self.window.flip = types.MethodType(flip_callback, window, application)
+
+        # call the draw method as fast as possible, i.e. at video frame rate!
+        pyglet.clock.schedule(self.draw,application)
+        # mainloop
+        pyglet.app.run()
+        pyglet.app.EventLoop().exit()
+        self.window.set_visible(False)
 
     def flip(self):
         """Draws the frame buffer to the screen"""
